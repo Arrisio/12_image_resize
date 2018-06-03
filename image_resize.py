@@ -17,7 +17,7 @@ def calc_new_image_size(orig_size, width=None, height=None, scale=None):
         return orig_size
 
 
-def set_new_img_name(orig_name, img_size, new_name=None ):
+def set_new_img_name(orig_name, img_size, new_name=None):
     if new_name:
         return new_name
     else:
