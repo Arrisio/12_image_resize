@@ -17,6 +17,12 @@ def calc_new_image_size(orig_size, width=None, height=None, scale=None):
         return orig_size
 
 
+def print_scale_warning(img_size, img_new_size):
+    if img_size[0] / img_new_size[0] != img_size[1] / img_new_size[1]:
+        print('\nWarning! Proportions of the original '
+              'and resulting images are differen')
+
+
 def set_new_img_name(orig_name, img_size, new_name=None):
     if new_name:
         return new_name
@@ -31,8 +37,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-i', '-img',
-        action='store',
+        '-i', '-img', action='store',
         dest='path_to_original',
         help='image that will ber resized',
         required=True
@@ -66,26 +71,49 @@ def parse_arguments():
     return parser.parse_args()
 
 
+def validate_arguments(params):
+    if not(params.height or params.width or params.scale):
+        raise argparse.ArgumentTypeError(
+            'You should speсify scale or height and width params'
+        )
+    elif (params.height or params.width) and params.scale:
+        raise argparse.ArgumentTypeError(
+            "Can't use -scale and -height/-with options in the together"
+        )
+    elif (
+            (params.height and params.height <= 0)or
+            (params.width and params.width <= 0) or
+            (params.scale and params.scale <= 0)
+    ):
+        raise argparse.ArgumentTypeError("Params must be greater than zero")
+
+
 if __name__ == '__main__':
     params = parse_arguments()
 
     try:
+        validate_arguments(params)
+    except argparse.ArgumentTypeError as args_err:
+        exit(args_err)
+
+    try:
         img = Image.open(params.path_to_original)
-        new_size = calc_new_image_size(
-            img.size,
-            width=params.width,
-            height=params.height,
-            scale=params.scale
-        )
+    except OSError as load_img_err:
+        exit("Can't load image: {}".format(load_img_err))
 
-        result_img = img.resize(new_size)
+    new_size = calc_new_image_size(
+        img.size, width=params.width, height=params.height, scale=params.scale
+    )
 
-        path_to_result = set_new_img_name(
-            params.path_to_original, new_size, params.path_to_result
-        )
+    path_to_result = set_new_img_name(
+        params.path_to_original, new_size, params.path_to_result
+    )
 
+    result_img = img.resize(new_size)
+    try:
         result_img.save(path_to_result)
-    except (ValueError, OSError) as image_error:
-        exit(image_error)
+    except OSError as save_img_err:
+        exit("Can't save image: {}".format(save_img_err))
 
-    print('Image saved to {} with size {}'.format(path_to_result, new_size))
+    print_scale_warning(img.size, new_size)
+    print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
