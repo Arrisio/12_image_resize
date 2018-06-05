@@ -33,6 +33,14 @@ def set_new_img_name(orig_name, img_size, new_name=None):
         )
 
 
+def save_image(result_img, path_to_result, new_size=None):
+    try:
+        result_img.save(path_to_result)
+    except OSError as save_img_err:
+        exit("Can't save image: {}".format(save_img_err))
+    print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
+
+
 def parse_arguments():
     parser = argparse.ArgumentParser()
 
@@ -81,7 +89,7 @@ def validate_arguments(params):
             "Can't use -scale and -height/-with options in the together"
         )
     elif (
-            (params.height and params.height <= 0)or
+            (params.height and params.height <= 0) or
             (params.width and params.width <= 0) or
             (params.scale and params.scale <= 0)
     ):
@@ -105,15 +113,11 @@ if __name__ == '__main__':
         img.size, width=params.width, height=params.height, scale=params.scale
     )
 
+    result_img = img.resize(new_size)
     path_to_result = set_new_img_name(
         params.path_to_original, new_size, params.path_to_result
     )
 
-    result_img = img.resize(new_size)
-    try:
-        result_img.save(path_to_result)
-    except OSError as save_img_err:
-        exit("Can't save image: {}".format(save_img_err))
-
     print_scale_warning(img.size, new_size)
-    print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
+
+    save_image(result_img, path_to_result, new_size)
