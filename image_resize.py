@@ -81,11 +81,17 @@ def validate_arguments(params):
             "Can't use -scale and -height/-with options in the together"
         )
     elif (
-            (params.height and params.height <= 0) or
-            (params.width and params.width <= 0) or
-            (params.scale and params.scale <= 0)
+        (params.height and params.height <= 0) or
+        (params.width and params.width <= 0) or
+        (params.scale and params.scale <= 0)
     ):
         raise argparse.ArgumentTypeError("Params must be greater than zero")
+
+    if not os.path.isfile(params.path_to_original):
+        raise argparse.ArgumentTypeError('Invalid path to target image')
+
+    if params.path_to_result and not os.path.isdir(params.path_to_result):
+        raise argparse.ArgumentTypeError('Invalid output path')
 
 
 def resize_image(img, params):
@@ -107,17 +113,10 @@ if __name__ == '__main__':
     except argparse.ArgumentTypeError as args_err:
         exit(args_err)
 
-    try:
-        img = Image.open(params.path_to_original)
-    except OSError as load_img_err:
-        exit("Can't load image: {}".format(load_img_err))
-
+    img = Image.open(params.path_to_original)
     result_img, path_to_result, new_size = resize_image(img, params)
 
-    try:
-        result_img.save(path_to_result)
-    except OSError as save_img_err:
-        exit("Can't save image: {}".format(save_img_err))
+    result_img.save(path_to_result)
     print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
 
     print_scale_warning(img.size, new_size)
