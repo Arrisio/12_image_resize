@@ -33,14 +33,6 @@ def set_new_img_name(orig_name, img_size, new_name=None):
         )
 
 
-def save_image(result_img, path_to_result, new_size=None):
-    try:
-        result_img.save(path_to_result)
-    except OSError as save_img_err:
-        exit("Can't save image: {}".format(save_img_err))
-    print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
-
-
 def parse_arguments():
     parser = argparse.ArgumentParser()
 
@@ -95,6 +87,7 @@ def validate_arguments(params):
     ):
         raise argparse.ArgumentTypeError("Params must be greater than zero")
 
+
 def resize_image(img, params):
     new_size = calc_new_image_size(
         img.size, width=params.width, height=params.height, scale=params.scale
@@ -104,6 +97,7 @@ def resize_image(img, params):
         params.path_to_original, new_size, params.path_to_result
     )
     return result_img, path_to_result, new_size
+
 
 if __name__ == '__main__':
     params = parse_arguments()
@@ -118,7 +112,7 @@ if __name__ == '__main__':
     except OSError as load_img_err:
         exit("Can't load image: {}".format(load_img_err))
 
-    result_img, path_to_result, new_size= resize_image(img, params)
+    result_img, path_to_result, new_size = resize_image(img, params)
 
     try:
         result_img.save(path_to_result)
