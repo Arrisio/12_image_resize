@@ -97,9 +97,9 @@ def validate_arguments(params):
     if not os.path.isfile(params.original_path):
         raise argparse.ArgumentTypeError('Invalid path to target image')
 
-    if params.result_path and (
-            not os.path.isdir(params.result_path) or
-            not os.path.isdir(os.path.split(params.result_path)[0])
+    if params.result_path and not (
+            os.path.isdir(params.result_path) or
+            os.path.isdir(os.path.split(params.result_path)[0])
     ):
         raise argparse.ArgumentTypeError('Invalid output path')
 
