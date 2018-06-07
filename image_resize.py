@@ -18,7 +18,10 @@ def calc_new_image_size(orig_size, width=None, height=None, scale=None):
 
 
 def is_image_ratio_changed(img_size, img_new_size):
-    return img_size[0] / img_new_size[0] != img_size[1] / img_new_size[1]
+    return (
+        round(img_size[0] / img_new_size[0]) !=
+        round(img_size[1] / img_new_size[1])
+    )
 
 
 def set_result_path(orig_path, img_size, result_path=None):
