@@ -94,17 +94,6 @@ def validate_arguments(params):
         raise argparse.ArgumentTypeError('Invalid output path')
 
 
-def resize_image(img, params):
-    new_size = calc_new_image_size(
-        img.size, width=params.width, height=params.height, scale=params.scale
-    )
-    result_img = img.resize(new_size)
-    path_to_result = set_new_img_name(
-        params.path_to_original, new_size, params.path_to_result
-    )
-    return result_img, path_to_result, new_size
-
-
 if __name__ == '__main__':
     params = parse_arguments()
 
@@ -114,7 +103,14 @@ if __name__ == '__main__':
         exit(args_err)
 
     img = Image.open(params.path_to_original)
-    result_img, path_to_result, new_size = resize_image(img, params)
+
+    new_size = calc_new_image_size(
+        img.size, width=params.width, height=params.height, scale=params.scale
+    )
+    result_img = img.resize(new_size)
+    path_to_result = set_new_img_name(
+        params.path_to_original, new_size, params.path_to_result
+    )
 
     result_img.save(path_to_result)
     print('\nImage saved to {} with size {}'.format(path_to_result, new_size))
