@@ -78,16 +78,18 @@ def parse_arguments():
         type=float
     )
 
+    validate_arguments(parser)
     return parser.parse_args()
 
 
-def validate_arguments(params):
+def validate_arguments(parser):
+    params = parser.parse_args()
+
     if not(params.height or params.width or params.scale):
-        raise argparse.ArgumentError(
-            'You should speсify scale or height and width params'
-        )
+        parser.error('You should speсify scale or height and width params')
+
     elif (params.height or params.width) and params.scale:
-        raise argparse.ArgumentError(
+        parser.error(
             "Can't use -scale and -height/-with options in the together"
         )
     elif (
@@ -95,25 +97,18 @@ def validate_arguments(params):
         (params.width and params.width <= 0) or
         (params.scale and params.scale <= 0)
     ):
-        raise argparse.ArgumentTypeError("Params must be greater than zero")
+        parser.error("Params must be greater than zero")
 
     if not os.path.isfile(params.original_path):
-        raise argparse.ArgumentTypeError('Invalid path to target image')
+        parser.error('Invalid path to target image')
 
-    if params.result_path and not (
-            os.path.isdir(params.result_path) or
-            os.path.isdir(os.path.split(params.result_path)[0])
-    ):
-        raise argparse.ArgumentTypeError('Invalid output path')
+    result_dir = os.path.split(params.result_path)[0]
+    if result_dir and not os.path.isdir(result_dir):
+            parser.error('Invalid output path {}')
 
 
 if __name__ == '__main__':
     params = parse_arguments()
-
-    try:
-        validate_arguments(params)
-    except argparse.ArgumentTypeError as args_err:
-        exit(args_err)
 
     img = Image.open(params.original_path)
 
