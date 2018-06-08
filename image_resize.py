@@ -104,7 +104,7 @@ def validate_arguments(parser):
 
     result_dir = os.path.split(params.result_path)[0]
     if result_dir and not os.path.isdir(result_dir):
-            parser.error('Invalid output path {}')
+            parser.error('Invalid output path')
 
 
 if __name__ == '__main__':
